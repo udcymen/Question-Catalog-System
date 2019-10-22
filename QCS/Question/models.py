@@ -1,5 +1,4 @@
 from django.db import models
-from django.utils import timezone
 from django.core.validators import MaxValueValidator, MinValueValidator
 
 
@@ -43,11 +42,29 @@ class User(models.Model):
     # Regular Fields
     user_name = models.CharField(max_length=256)
     full_name = models.CharField(max_length=256)
-    email = models.EmailField()  # If user_name@udel.edu != email
+    email = models.EmailField()
     create_date = models.DateTimeField(auto_now_add=True, editable=False)
+    # TODO Add account validation period
 
     def __str__(self):
         return self.user_name + ": " + self.email
+
+
+class ChangeLog(models.Model):
+    # Primary Key
+    id = models.AutoField(primary_key=True)
+
+    # Foreign Keys
+    question = models.ForeignKey('Question', on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+
+    # Regular Fields
+    change_set = models.CharField(max_length=256)
+    previous_version = models.PositiveIntegerField()
+    date = models.DateTimeField(auto_now=True, editable=False)
+
+    def __str__(self):
+        return "Modified by " + str(self.user) + " at " + str(self.date)
 
 
 class Question(models.Model):
@@ -100,24 +117,7 @@ class Submission(models.Model):
     input = models.CharField(max_length=256)
     output = models.CharField(max_length=256)
     detail = models.CharField(max_length=256)
-    status = models.CharField(max_length=256)  # Ask Dr.Bart
+    status = models.CharField(max_length=256)
 
     def __str__(self):
         return str(self.id) + " Links to " + str(self.id)
-
-
-class ChangeLog(models.Model):
-    # Primary Key
-    id = models.AutoField(primary_key=True)
-
-    # Foreign Keys
-    question = models.ForeignKey(Question, on_delete=models.CASCADE)
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
-
-    # Regular Fields
-    change_set = models.CharField(max_length=256)
-    previous_version = models.PositiveIntegerField()  # Ask Dr.Bart
-    date = models.DateTimeField(auto_now=True, editable=False)
-
-    def __str__(self):
-        return "Modified by " + str(self.user) + " at " + str(self.date)
