@@ -70,3 +70,6 @@ venv
 /QCS/Question/migrations/
 /QCS/QCS/__pycache__/
 /QCS/Question/__pycache__/
+
+# vs Code IDE
+.vscode
