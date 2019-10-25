@@ -64,7 +64,7 @@ typings/
 .idea
 
 # Python Virtual Space
-venv
+.venv
 
 # Django Migrations/Cache
 /QCS/Question/migrations/

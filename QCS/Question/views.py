@@ -11,7 +11,6 @@ def home(request):
 def detail(request):
     # Get Latest Ten Questions
     if request.method == "GET":
-            if request.method == "GET":
         question_list = Question.objects.order_by('create_date')[:10]
         context = {
             'question_list': question_list,
