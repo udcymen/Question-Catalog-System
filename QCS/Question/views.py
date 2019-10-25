@@ -3,11 +3,13 @@ from django.http import HttpResponse, JsonResponse
 from django.shortcuts import render, get_object_or_404
 from django.template import loader
 from .models import Question
+from django.views.generic.base import TemplateView
 
+def home(request):
+    return TemplateView.as_view(template_name='home.html')
 
-def index(request):
-
-    return render(request, 'index.html')
+def detail(request):
+    # if request.
 
 
 def question_index(request):
@@ -33,4 +35,5 @@ def api_question_id(request, question_id):
 
 
 def create(request):
-    return render(request, 'create_question.html')
+    if request.user.is_authenticated():
+        return render(request, 'create_question.html')
