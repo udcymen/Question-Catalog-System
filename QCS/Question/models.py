@@ -46,13 +46,19 @@ class Topic(models.Model):
     # Regular Fields
     topic = models.CharField(max_length=256)
 
+    def __str__(self):
+        return self.topic
+
 
 class QuestionType(models.Model):
     # Regular Fields
     type = models.CharField(max_length=256)
 
+    def __str__(self):
+        return self.type
 
-class UserProfile(models.Model):
+
+# class UserProfile(models.Model):
     # Foreign Keys
     user = models.OneToOneField(User, on_delete=models.CASCADE)
 
@@ -66,6 +72,9 @@ class QuestionChangeLog(models.Model):
     change_set = models.CharField(max_length=256)
     previous_version = models.PositiveIntegerField()
     date = models.DateTimeField(auto_now=True, editable=False)
+
+    def __str__(self):
+        return str(self.question) + ": Version " + str(self.previous_version)
 
 
 class Question(models.Model):
@@ -96,11 +105,16 @@ class Question(models.Model):
             self.version += 1
         super(Question, self).save(*args, **kwargs)
 
+    def __str__(self):
+        return self.name
+
+
 class Submission(models.Model):
     # Foreign Keys
     question = models.ForeignKey(Question, on_delete=models.CASCADE)
 
     # Regular Fields
+    name = models.CharField(max_length=256)
     student_code = models.CharField(max_length=256)
     correct = models.BooleanField(default=False)
     score = models.PositiveSmallIntegerField(default=0, validators=[MinValueValidator(0), MaxValueValidator(100)])
@@ -109,4 +123,7 @@ class Submission(models.Model):
     output = models.CharField(max_length=256)
     detail = models.CharField(max_length=256)
     status = models.CharField(max_length=256)
+
+    def __str__(self):
+        return self.name
 
