@@ -5,7 +5,7 @@ import datetime
 
 class Course(models.Model):
     class Meta:
-        unique_together = [['year', 'semester', 'level']]
+        unique_together = ('year', 'semester', 'level')
 
 
     # Regular Fields
@@ -31,9 +31,7 @@ class Course(models.Model):
     )
 
     # Foreign Keys
-    #   Non-Nullable
     professor = models.ManyToManyField(User, related_name='professor')
-    #   Nullable
     teaching_assitant = models.ManyToManyField(User, related_name='teaching_assitant', blank=True)
     students = models.ManyToManyField(User, related_name='student', blank=True)
     
@@ -58,11 +56,6 @@ class QuestionType(models.Model):
         return self.type
 
 
-# class UserProfile(models.Model):
-    # Foreign Keys
-    user = models.OneToOneField(User, on_delete=models.CASCADE)
-
-
 class QuestionChangeLog(models.Model):
     # Foreign Keys
     user = models.ForeignKey(User, on_delete=models.CASCADE)
@@ -79,17 +72,15 @@ class QuestionChangeLog(models.Model):
 
 class Question(models.Model):
     # Foreign Keys
-    #   Nullable
     course = models.ManyToManyField(Course, blank=True)
     topic = models.ManyToManyField(Topic, blank=True)
     forked_from = models.ForeignKey('self', on_delete=models.CASCADE, blank=True, null=True)
-    #   Non-Nullable
     type = models.ManyToManyField(QuestionType)
     author = models.ForeignKey(User, on_delete=models.CASCADE, related_name='author')
     last_editor = models.ForeignKey(User, on_delete=models.CASCADE, related_name='last_editor')
 
     # Regular Fields
-    name = models.CharField(max_length=256)
+    name = models.CharField(max_length=256, unique=True, blank=True, null=True)
     description = models.CharField(max_length=256)
     instruction = models.CharField(max_length=256)
     difficulty = models.PositiveSmallIntegerField(default=1, validators=[MinValueValidator(1), MaxValueValidator(100)])
