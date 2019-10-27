@@ -57,7 +57,7 @@ class UserProfile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
 
 
-class ChangeLog(models.Model):
+class QuestionChangeLog(models.Model):
     # Foreign Keys
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     question = models.ForeignKey('Question', on_delete=models.CASCADE)
@@ -77,7 +77,7 @@ class Question(models.Model):
     #   Non-Nullable
     type = models.ManyToManyField(QuestionType)
     author = models.ForeignKey(User, on_delete=models.CASCADE, related_name='author')
-    last_editor = models.ForeignKey(User, on_delete=models.CASCADE, related_name='last_editor', editable=False)
+    last_editor = models.ForeignKey(User, on_delete=models.CASCADE, related_name='last_editor')
 
     # Regular Fields
     name = models.CharField(max_length=256)
@@ -95,7 +95,6 @@ class Question(models.Model):
         else:
             self.version += 1
         super(Question, self).save(*args, **kwargs)
-
 
 class Submission(models.Model):
     # Foreign Keys
