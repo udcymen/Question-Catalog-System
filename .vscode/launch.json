@@ -9,6 +9,7 @@
             "type": "python",
             "request": "launch",
             "program": "${workspaceFolder}\\QCS\\manage.py",
+            "console": "integratedTerminal",
             "args": [
                 "runserver",
                 "--noreload"
@@ -31,7 +32,8 @@
             "request": "launch",
             "program": "${workspaceFolder}\\QCS\\manage.py",
             "args": [
-                "makemigrations"
+                "makemigrations",
+                "Question"
             ],
             "django": true
         },

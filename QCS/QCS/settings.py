@@ -90,9 +90,9 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
         'NAME': 'postgres',
-        'USER': 'postgres',
+        'USER': 'enterprisedb',
         'PASSWORD': 'postgres',
-        'HOST': '3.218.173.131',
+        'HOST': '54.210.51.32',
         'PORT': '9999'
     }
 }
@@ -140,16 +140,16 @@ STATICFILES_DIRS = [
     os.path.join(BASE_DIR, "static")
 ]
 
-LOGIN_REDIRECT_URL = 'home'
-LOGOUT_REDIRECT_URL = 'home'
+LOGIN_REDIRECT_URL = 'index'
+LOGOUT_REDIRECT_URL = 'index'
 
-SOCIAL_AUTH_LOGIN_REDIRECT_URL = 'home'
-SOCIAL_AUTH_LOGOUT_REDIRECT_URL = 'home'
+SOCIAL_AUTH_LOGIN_REDIRECT_URL = 'index'
+SOCIAL_AUTH_LOGOUT_REDIRECT_URL = 'index'
 
 SOCIAL_AUTH_URL_NAMESPACE = 'social'
 
-SOCIAL_AUTH_GOOGLE_OAUTH2_KEY = '523144485911-av8bqh3go2m199m7655v89lh7kb0f6si.apps.googleusercontent.com'
-SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = 'yBVspDvdn9l7w-2yiRzAalYl'
+SOCIAL_AUTH_GOOGLE_OAUTH2_KEY = '523144485911-fgkhltor1h633aprg7i6d9to47am21vu.apps.googleusercontent.com'
+SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = 'Fym-7RKYe17ramJZcMrJGIIf'
 
 SOCIAL_AUTH_GITHUB_KEY = '741ff82e6ff1636e88ed'
 SOCIAL_AUTH_GITHUB_SECRET = '5ee5de6dfc9da750b55ecee21e565be100ee1f3c'

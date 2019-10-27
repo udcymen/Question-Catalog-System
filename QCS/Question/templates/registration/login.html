@@ -8,7 +8,7 @@
     {% csrf_token %}
     {{ form.as_p }}
     <button type="submit">Login</button>
-    <li href="{% url 'social:begin' 'google-oauth2' %}">Login in With Google</li>
-    <li href="{% url 'social:begin' 'github' %}">Login in With Github</li>
+    <li> <a href="{% url 'social:begin' 'google-oauth2' %}">Login in With Google<a></li>
+    <li> <a href="{% url 'social:begin' 'github' %}">Login in With Github<a></li>
 </form>
 {% endblock %}
