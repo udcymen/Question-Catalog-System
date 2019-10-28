@@ -16,7 +16,7 @@
         {% if question_list %}
             <ul>
             {% for question in question_list %}
-                <li><a href="/question/{{ question.id }}">{{ question.description }}</a></li>
+                <li><a href="/question/{{ question.id }}">{{ question.name }}</a></li>
             {% endfor %}
             </ul>
         {% else %}

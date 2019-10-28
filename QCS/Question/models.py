@@ -1,7 +1,7 @@
 from django.db import models
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.contrib.auth.models import User
-import datetime
+from datetime import datetime
 
 class Course(models.Model):
     class Meta:
@@ -11,7 +11,7 @@ class Course(models.Model):
     # Regular Fields
     name = models.CharField(max_length=256)
     level = models.PositiveSmallIntegerField(default=100, validators=[MinValueValidator(100), MaxValueValidator(999)])
-    year = models.PositiveSmallIntegerField(default=datetime.datetime.now().year, validators=[MinValueValidator(1000), MaxValueValidator(9999)])
+    year = models.PositiveSmallIntegerField(default=datetime.now().year, validators=[MinValueValidator(1000), MaxValueValidator(9999)])
 
     # Semester Choice - ENUM
     FALL = 'FA'
