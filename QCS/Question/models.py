@@ -33,9 +33,9 @@ class Course(models.Model):
     # Foreign Keys
     professor = models.ManyToManyField(User, related_name='professor')
     teaching_assitant = models.ManyToManyField(User, related_name='teaching_assitant', blank=True)
-    students = models.ManyToManyField(User, related_name='student', blank=True)
+    student = models.ManyToManyField(User, related_name='student', blank=True)
+    question = models.ManyToManyField(Question, blank=True)
     
-
     def __str__(self):
         return " ".join([str(self.year), self.get_semester_display(), "CISC" + str(self.level), self.name])
 
@@ -75,7 +75,7 @@ class Question(models.Model):
     course = models.ManyToManyField(Course, blank=True)
     topic = models.ManyToManyField(Topic, blank=True)
     forked_from = models.ForeignKey('self', on_delete=models.CASCADE, blank=True, null=True)
-    type = models.ManyToManyField(QuestionType)
+    type = models.ForeignKey(QuestionType, on_delete=models.CASCADE)
     author = models.ForeignKey(User, on_delete=models.CASCADE, related_name='author')
     last_editor = models.ForeignKey(User, on_delete=models.CASCADE, related_name='last_editor')
 
