@@ -46,19 +46,8 @@ def quetion_create(request):
 @require_http_methods(["GET", "POST", "DELETE"])
 def question_detail(request, question_ref):
     if request.method == "GET":
-        if isinstance(question_ref, int):
-            question = get_object_or_404(Question, pk=question_ref)
-            form = QuestionForm(instance=question)
-        else:
-            question_name_list = question_ref.split('-')
-            roman_numeral = re.search('^(?=[MDCLXVI])M*(C[MD]|D?C*)(X[CL]|L?X*)(I[XV]|V?I*)$', question_name_list[-1], re.IGNORECASE).string
-            if roman_numeral:
-                question_name_list.pop()
-            question_name = " ".join([s.capitalize() for s in question_name_list])
-            if roman_numeral:
-                question_name += (" " + roman_numeral.upper())
-            question = get_object_or_404(Question, name=question_name)
-            form = QuestionForm(instance=question)
+        question = get_question(question_ref)
+        form = QuestionForm(instance=question)
         return render(request, 'question_detail.html', {'form': form})
 
     elif request.method == "POST":
@@ -70,5 +59,20 @@ def question_detail(request, question_ref):
         # TODO Delete
         if request.user.is_authenticated:
             return HttpResponse("TBD")
+
+
+def get_question(question_ref):
+    if isinstance(question_ref, int):
+        question = get_object_or_404(Question, pk=question_ref)
+    else:
+        question_name_list = question_ref.split('-')
+        roman_numeral = re.search('^(?=[MDCLXVI])M*(C[MD]|D?C*)(X[CL]|L?X*)(I[XV]|V?I*)$', question_name_list[-1], re.IGNORECASE)
+        if roman_numeral:
+            question_name_list.pop()
+        question_name = " ".join([s.capitalize() for s in question_name_list])
+        if roman_numeral:
+            question_name += (" " + roman_numeral.string.upper())
+        question = get_object_or_404(Question, name=question_name)
+    return question
 
 
