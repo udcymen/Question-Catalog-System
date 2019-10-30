@@ -4,6 +4,7 @@ from django.shortcuts import render, get_object_or_404
 from django.views.decorators.http import require_http_methods
 from .models import Question, Course
 from django.forms import ModelForm
+import re
 
 
 class QuestionForm(ModelForm):
@@ -43,30 +44,22 @@ def quetion_create(request):
 
 
 @require_http_methods(["GET", "POST", "DELETE"])
-def quetion_detail_id(request, question_id):
+def question_detail(request, question_ref):
     if request.method == "GET":
-        form = QuestionForm(instance=Question.objects.get(pk=question_id))
+        if isinstance(question_ref, int):
+            question = get_object_or_404(Question, pk=question_ref)
+            form = QuestionForm(instance=question)
+        else:
+            question_name_list = question_ref.split('-')
+            roman_numeral = re.search('^(?=[MDCLXVI])M*(C[MD]|D?C*)(X[CL]|L?X*)(I[XV]|V?I*)$', question_name_list[-1], re.IGNORECASE).string
+            if roman_numeral:
+                question_name_list.pop()
+            question_name = " ".join([s.capitalize() for s in question_name_list])
+            if roman_numeral:
+                question_name += (" " + roman_numeral.upper())
+            question = get_object_or_404(Question, name=question_name)
+            form = QuestionForm(instance=question)
         return render(request, 'question_detail.html', {'form': form})
-
-    elif request.method == "POST":
-        # TODO Update
-        if request.user.is_authenticated:
-            return HttpResponse("TBD")
-            
-    elif request.method == "DELETE":
-        # TODO Delete
-        if request.user.is_authenticated:
-            return HttpResponse("TBD")
-
-
-@require_http_methods(["GET", "POST", "DELETE"])
-def quetion_detail_name(request, question_name):
-    if "-" in question_name and question_name.islower():
-        question_name = " ".join([s.capitalize() for s in question_name.split("-")])
-
-    if request.method == "GET":
-        question = get_object_or_404(Question, name=question_name)
-        return HttpResponse("You're looking at question %s." % question)
 
     elif request.method == "POST":
         # TODO Update
