@@ -2,8 +2,9 @@ from django.core import serializers
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import render, get_object_or_404
 from django.views.decorators.http import require_http_methods
-from .models import Question, Course
+from .models import *
 from django.forms import ModelForm
+from json import loads
 
 
 class QuestionForm(ModelForm):
@@ -36,7 +37,17 @@ def quetion_create(request):
     elif request.method == "POST":
         # TODO Put Question into System
         if request.user.is_authenticated:
-            Question.objects.save()
+            question = Question.objects.create(
+                type= QuestionType.objects.get(id =request.POST['type']),
+                author= User.objects.get(id = request.POST['author']),
+                last_editor = request.user,
+                name=request.POST['name'],
+                description=request.POST['description'],
+                instruction=request.POST['instruction'], 
+                difficulty=request.POST['difficulty']
+            )
+            for id in request.POST.getlist('topic'):
+                question.topic.add(Topic.objects.get(id = id))
             return HttpResponse('TODO')
         else:
             return HttpResponse('You are not logged in', status=401)
