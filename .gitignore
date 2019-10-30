@@ -70,3 +70,6 @@ typings/
 /QCS/Question/migrations/
 /QCS/QCS/__pycache__/
 /QCS/Question/__pycache__/
+
+# vs code setting
+.vscode/setting.json

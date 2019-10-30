@@ -5,12 +5,13 @@ from datetime import datetime
 
 class Course(models.Model):
     class Meta:
-        unique_together = ('year', 'semester', 'level')
+        unique_together = ('year', 'semester', 'code', 'section')
 
 
     # Regular Fields
     name = models.CharField(max_length=256)
-    level = models.PositiveSmallIntegerField(default=100, validators=[MinValueValidator(100), MaxValueValidator(999)])
+    code = models.PositiveSmallIntegerField(default=100, validators=[MinValueValidator(100), MaxValueValidator(999)])
+    section = models.PositiveSmallIntegerField(default=100, validators=[MinValueValidator(100), MaxValueValidator(999)])
     year = models.PositiveSmallIntegerField(default=datetime.now().year, validators=[MinValueValidator(1000), MaxValueValidator(9999)])
 
     # Semester Choice - ENUM
@@ -34,10 +35,10 @@ class Course(models.Model):
     professor = models.ManyToManyField(User, related_name='professor')
     teaching_assitant = models.ManyToManyField(User, related_name='teaching_assitant', blank=True)
     student = models.ManyToManyField(User, related_name='student', blank=True)
-    question = models.ManyToManyField(Question, blank=True)
+    question = models.ManyToManyField('Question', blank=True)
     
     def __str__(self):
-        return " ".join([str(self.year), self.get_semester_display(), "CISC" + str(self.level), self.name])
+        return " ".join([str(self.year), self.get_semester_display(), "CISC" + str(self.code) + "-" + str(self.section), self.name])
 
 
 class Topic(models.Model):
@@ -72,7 +73,6 @@ class QuestionChangeLog(models.Model):
 
 class Question(models.Model):
     # Foreign Keys
-    course = models.ManyToManyField(Course, blank=True)
     topic = models.ManyToManyField(Topic, blank=True)
     forked_from = models.ForeignKey('self', on_delete=models.CASCADE, blank=True, null=True)
     type = models.ForeignKey(QuestionType, on_delete=models.CASCADE)

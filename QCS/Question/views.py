@@ -9,7 +9,7 @@ from django.forms import ModelForm
 class QuestionForm(ModelForm):
     class Meta:
         model = Question
-        fields = ['course', 'topic', 'type', 'author', 'name', 'description', 'instruction', 'difficulty']
+        fields = ['topic', 'type', 'author', 'name', 'description', 'instruction', 'difficulty']
 
 
 
