@@ -45,22 +45,36 @@ def quetion_create(request):
 
 @require_http_methods(["GET", "POST", "DELETE"])
 def question_detail(request, question_ref):
-    if request.method == "GET":
-        question = get_question(question_ref)
+    question = get_question(question_ref)
+
+    if request.method == "GET":    
         form = QuestionForm(instance=question)
         return render(request, 'question_detail.html', {'form': form})
 
     elif request.method == "POST":
         # TODO Update
         if request.user.is_authenticated:
-            return HttpResponse("TBD")
+            if request.user in question.professor or request.user in question.teaching_assitant:
+
+                return HttpResponse("Question " + id + " Updated" )
+            else:
+                return HttpResponse('You are not the author of this question', status=401)
+        else:
+            return HttpResponse('You are not logged in', status=401)
             
     elif request.method == "DELETE":
-        # TODO Delete
         if request.user.is_authenticated:
-            return HttpResponse("TBD")
+            if request.user in question.professor:
+                id = question.Id
+                question.delete()
+                return HttpResponse("Question " + id + " Deleted" )
+            else:
+                return HttpResponse('You are not the author of this question', status=401)
+        else:
+            return HttpResponse('You are not logged in', status=401)
 
 
+# Helper Function to Get Question Object via Question_Id or Question_Name
 def get_question(question_ref):
     if isinstance(question_ref, int):
         question = get_object_or_404(Question, pk=question_ref)
