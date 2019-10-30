@@ -70,6 +70,7 @@ class QuestionChangeLog(models.Model):
     def __str__(self):
         return str(self.question) + ": Version " + str(self.previous_version)
 
+    
 
 class Question(models.Model):
     # Foreign Keys
@@ -88,6 +89,12 @@ class Question(models.Model):
     last_modified_date = models.DateTimeField(auto_now=True, editable=False)
     version = models.PositiveIntegerField(editable=False)
     student_test = models.BooleanField(default=False)
+
+    # def create_question(self, topic, type, author, name, description, instruction, difficulty):
+    #     question = self.create(topic=topic, type=type, author=author, name=name,
+    #     description=description, instruction=instruction, difficulty=difficulty)
+    #     #Do somthing with the question
+    #     return question
 
     def save(self, *args, **kwargs):
         if not self.id:
