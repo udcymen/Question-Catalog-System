@@ -54,9 +54,9 @@ def question_detail(request, question_ref):
     elif request.method == "POST":
         # TODO Update
         if request.user.is_authenticated:
-            if request.user in question.professor or request.user in question.teaching_assitant:
+            if request.user is question.author:
 
-                return HttpResponse("Question " + id + " Updated" )
+                return HttpResponse("Question " + question.Id + " Updated" )
             else:
                 return HttpResponse('You are not the author of this question', status=401)
         else:
@@ -64,7 +64,7 @@ def question_detail(request, question_ref):
             
     elif request.method == "DELETE":
         if request.user.is_authenticated:
-            if request.user in question.professor:
+            if request.user is question.author:
                 id = question.Id
                 question.delete()
                 return HttpResponse("Question " + id + " Deleted" )
