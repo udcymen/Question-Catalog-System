@@ -4,7 +4,7 @@ from django.shortcuts import render, get_object_or_404
 from django.views.decorators.http import require_http_methods
 from .models import *
 from django.forms import ModelForm
-from json import loads
+import re
 
 
 class QuestionForm(ModelForm):
@@ -54,39 +54,49 @@ def quetion_create(request):
 
 
 @require_http_methods(["GET", "POST", "DELETE"])
-def quetion_detail_id(request, question_id):
-    if request.method == "GET":
-        form = QuestionForm(instance=Question.objects.get(pk=question_id))
+def question_detail(request, question_ref):
+    question = get_question(question_ref)
+
+    if request.method == "GET":    
+        form = QuestionForm(instance=question)
         return render(request, 'question_detail.html', {'form': form})
 
     elif request.method == "POST":
         # TODO Update
         if request.user.is_authenticated:
-            return HttpResponse("TBD")
+            if request.user in question.professor or request.user in question.teaching_assitant:
+
+                return HttpResponse("Question " + id + " Updated" )
+            else:
+                return HttpResponse('You are not the author of this question', status=401)
+        else:
+            return HttpResponse('You are not logged in', status=401)
             
     elif request.method == "DELETE":
-        # TODO Delete
         if request.user.is_authenticated:
-            return HttpResponse("TBD")
+            if request.user in question.professor:
+                id = question.Id
+                question.delete()
+                return HttpResponse("Question " + id + " Deleted" )
+            else:
+                return HttpResponse('You are not the author of this question', status=401)
+        else:
+            return HttpResponse('You are not logged in', status=401)
 
 
-@require_http_methods(["GET", "POST", "DELETE"])
-def quetion_detail_name(request, question_name):
-    if "-" in question_name and question_name.islower():
-        question_name = " ".join([s.capitalize() for s in question_name.split("-")])
-
-    if request.method == "GET":
+# Helper Function to Get Question Object via Question_Id or Question_Name
+def get_question(question_ref):
+    if isinstance(question_ref, int):
+        question = get_object_or_404(Question, pk=question_ref)
+    else:
+        question_name_list = question_ref.split('-')
+        roman_numeral = re.search('^(?=[MDCLXVI])M*(C[MD]|D?C*)(X[CL]|L?X*)(I[XV]|V?I*)$', question_name_list[-1], re.IGNORECASE)
+        if roman_numeral:
+            question_name_list.pop()
+        question_name = " ".join([s.capitalize() for s in question_name_list])
+        if roman_numeral:
+            question_name += (" " + roman_numeral.string.upper())
         question = get_object_or_404(Question, name=question_name)
-        return HttpResponse("You're looking at question %s." % question)
-
-    elif request.method == "POST":
-        # TODO Update
-        if request.user.is_authenticated:
-            return HttpResponse("TBD")
-            
-    elif request.method == "DELETE":
-        # TODO Delete
-        if request.user.is_authenticated:
-            return HttpResponse("TBD")
+    return question
 
 
