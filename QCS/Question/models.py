@@ -41,7 +41,7 @@ class Course(models.Model):
         return " ".join([str(self.year), self.get_semester_display(), "CISC" + str(self.code) + "-" + str(self.section), self.name])
 
 
-class Topic(models.Model):
+class QuestionTopic(models.Model):
     # Regular Fields
     topic = models.CharField(max_length=256)
 
@@ -74,14 +74,14 @@ class QuestionChangeLog(models.Model):
 
 class Question(models.Model):
     # Foreign Keys
-    topic = models.ManyToManyField(Topic, blank=True)
+    topic = models.ManyToManyField(QuestionTopic, blank=True)
     forked_from = models.ForeignKey('self', on_delete=models.CASCADE, blank=True, null=True)
     type = models.ForeignKey(QuestionType, on_delete=models.CASCADE)
     author = models.ForeignKey(User, on_delete=models.CASCADE, related_name='author')
     last_editor = models.ForeignKey(User, on_delete=models.CASCADE, related_name='last_editor')
 
     # Regular Fields
-    name = models.CharField(max_length=256, unique=True, blank=True, null=True)
+    name = models.CharField(max_length=256, unique=True)
     description = models.CharField(max_length=256)
     instruction = models.CharField(max_length=256)
     difficulty = models.PositiveSmallIntegerField(default=1, validators=[MinValueValidator(1), MaxValueValidator(100)])

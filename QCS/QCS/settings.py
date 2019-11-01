@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'Question.apps.QuestionConfig',
     'social_django',
+    'djng',
 ]
 
 AUTHENTICATION_BACKENDS = {
@@ -136,9 +137,9 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 
-STATICFILES_DIRS = [
-    os.path.join(BASE_DIR, "static")
-]
+# STATICFILES_DIRS = [
+#     ('node_modules', os.path.join(BASE_DIR, 'node_modules')),
+# ]
 
 LOGIN_REDIRECT_URL = 'index'
 LOGOUT_REDIRECT_URL = 'index'
@@ -150,7 +151,4 @@ SOCIAL_AUTH_URL_NAMESPACE = 'social'
 
 SOCIAL_AUTH_GOOGLE_OAUTH2_KEY = '523144485911-fgkhltor1h633aprg7i6d9to47am21vu.apps.googleusercontent.com'
 SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = 'Fym-7RKYe17ramJZcMrJGIIf'
-
-SOCIAL_AUTH_GITHUB_KEY = '741ff82e6ff1636e88ed'
-SOCIAL_AUTH_GITHUB_SECRET = '5ee5de6dfc9da750b55ecee21e565be100ee1f3c'
 
