@@ -3,43 +3,6 @@ from django.core.validators import MaxValueValidator, MinValueValidator
 from django.contrib.auth.models import User
 from datetime import datetime
 
-class Course(models.Model):
-    class Meta:
-        unique_together = ('year', 'semester', 'code', 'section')
-
-
-    # Regular Fields
-    name = models.CharField(max_length=256)
-    code = models.PositiveSmallIntegerField(default=100, validators=[MinValueValidator(100), MaxValueValidator(999)])
-    section = models.PositiveSmallIntegerField(default=100, validators=[MinValueValidator(0), MaxValueValidator(999)])
-    year = models.PositiveSmallIntegerField(default=datetime.now().year, validators=[MinValueValidator(1000), MaxValueValidator(9999)])
-
-    # Semester Choice - ENUM
-    FALL = 'FA'
-    WINTER = 'WI'
-    SPRING = 'SP'
-    SUMMER = 'SU'
-    SEMESTER = [
-        (FALL, 'Fall'),
-        (WINTER, 'Winter'),
-        (SPRING, 'Spring'),
-        (SUMMER, 'Summer')
-    ]
-    semester = models.CharField(
-        max_length=2,
-        choices=SEMESTER,
-        default=FALL
-    )
-
-    # Foreign Keys
-    professor = models.ManyToManyField(User, related_name='professor')
-    teaching_assitant = models.ManyToManyField(User, related_name='teaching_assitant', blank=True)
-    student = models.ManyToManyField(User, related_name='student', blank=True)
-    question = models.ManyToManyField('Question', blank=True)
-    
-    def __str__(self):
-        return " ".join([str(self.year), self.get_semester_display(), "CISC" + str(self.code) + "-" + str(self.section), self.name])
-
 
 class QuestionTopic(models.Model):
     # Regular Fields
@@ -89,12 +52,6 @@ class Question(models.Model):
     version = models.PositiveIntegerField(editable=False)
     student_test = models.BooleanField(default=False)
 
-    # def create_question(self, topic, type, author, name, description, instruction, difficulty):
-    #     question = self.create(topic=topic, type=type, author=author, name=name,
-    #     description=description, instruction=instruction, difficulty=difficulty)
-    #     #Do somthing with the question
-    #     return question
-
     def save(self, *args, **kwargs):
         if not self.id:
             self.version = 1
@@ -104,6 +61,63 @@ class Question(models.Model):
 
     def __str__(self):
         return self.name
+
+
+class Course(models.Model):
+    class Meta:
+        unique_together = ('year', 'semester', 'code', 'section')
+
+
+    # Regular Fields
+    name = models.CharField(max_length=256)
+    code = models.PositiveSmallIntegerField(default=100, validators=[MinValueValidator(100), MaxValueValidator(999)])
+    section = models.PositiveSmallIntegerField(default=100, validators=[MinValueValidator(0), MaxValueValidator(999)])
+    year = models.PositiveSmallIntegerField(default=datetime.now().year, validators=[MinValueValidator(1000), MaxValueValidator(9999)])
+
+    # Semester Choice - ENUM
+    FALL = 'FA'
+    WINTER = 'WI'
+    SPRING = 'SP'
+    SUMMER = 'SU'
+    SEMESTER = [
+        (FALL, 'Fall'),
+        (WINTER, 'Winter'),
+        (SPRING, 'Spring'),
+        (SUMMER, 'Summer')
+    ]
+    semester = models.CharField(
+        max_length=2,
+        choices=SEMESTER,
+        default=FALL
+    )
+
+    # Foreign Keys
+    question = models.ManyToManyField(Question, blank=True)
+    
+    def __str__(self):
+        return " ".join([str(self.year), self.get_semester_display(), "CISC" + str(self.code) + "-" + str(self.section), self.name])
+
+
+class UserRole(models.Model):
+    # Regular Fields
+    name = models.CharField(max_length=256, unique=True)
+
+    def __str__(self):
+        return self.name
+        
+
+class Permission(models.Model):
+    class Meta:
+        unique_together = ('user', 'role', 'course')
+
+
+    # Foreign Keys    
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    role = models.ForeignKey(UserRole, on_delete=models.CASCADE)
+    course = models.ForeignKey(Course, on_delete=models.CASCADE)
+
+    def __str__(self):
+        return str(self.user) + ": " + str(self.role) + " - " + str(self.course)
 
 
 class Submission(models.Model):

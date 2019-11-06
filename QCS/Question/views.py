@@ -120,4 +120,18 @@ def get_question(question_ref):
         question = get_object_or_404(Question, name=question_name)
     return question
 
+# Check If Current User Have Permission Over Question
+def check_permission(user, question, request_method):
+    if request_method == "POST":
+        
+    elif request_method == "PUT":
+
+    elif request_method == "GET":
+
+    elif request_method == "DELETE":
+
+    else:
+        print(request_method + "Not Supported")
+
+
 
