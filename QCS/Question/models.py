@@ -1,6 +1,8 @@
 from django.db import models
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.contrib.auth.models import User
+from django.db.models.signals import post_save
+from django.dispatch import receiver
 from datetime import datetime
 
 
@@ -62,6 +64,12 @@ class Question(models.Model):
     def __str__(self):
         return self.name
 
+@receiver(post_save, sender=Question)
+def create_user_profile(sender, instance, created, update_fields, **kwargs):
+    if created:
+        print("created")
+    else:
+        print(update_fields)
 
 class Course(models.Model):
     class Meta:

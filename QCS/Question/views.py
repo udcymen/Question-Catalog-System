@@ -143,28 +143,16 @@ def quetion_create(request):
     elif request.method == "POST":
         # TODO Put Question into System
         if request.user.is_authenticated:
+            question_form = QuestionForm(request.POST)
+            if question_form.is_valid():
+                q = question_form.save(commit=False)
+                q.last_editor = request.user
+                q.save()
+                question_form.save_m2m()
 
-            new_question = Question.objects.create(
-                type = QuestionType.objects.get(id = request.POST['type']),
-                author = User.objects.get(id = request.POST['author']),
-                last_editor = request.user,
-                name = request.POST['name'],
-                description = request.POST['description'],
-                instruction = request.POST['instruction'], 
-                difficulty = request.POST['difficulty']
-            )
-            for id in request.POST.getlist('topic'):
-                new_question.topic.add(QuestionTopic.objects.get(id = id))
-
-            QuestionChangeLog.objects.create(
-                user = request.user,
-                question = new_question,
-                change_set = "Question Created",
-                previous_version = 0
-            )
-
-            return HttpResponse('Create Successfully')
-
+                return HttpResponse('Create Successfully')
+            else:
+                return render(request, 'question_create.html', {'form': question_form})
         else:
             return HttpResponse('You are not logged in', status=401)
 
