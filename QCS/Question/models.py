@@ -1,7 +1,7 @@
 from django.db import models
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.contrib.auth.models import User
-from django.db.models.signals import post_save
+from django.db.models.signals import pre_save
 from django.dispatch import receiver
 from datetime import datetime
 
@@ -54,22 +54,76 @@ class Question(models.Model):
     version = models.PositiveIntegerField(editable=False)
     student_test = models.BooleanField(default=False)
 
-    def save(self, *args, **kwargs):
+    @property
+    def track_fields(self):
+        return ('topic',
+                'forked_from',
+                'type',
+                'author',
+                'last_editor',
+                'name',
+                'description',
+                'instruction',
+                'difficulty',
+                'create_date',
+                'last_modified_date',
+                'version',
+                'student_test',)
+
+    def user_save(self, user, *args, **kwargs):
+        #print("test")
+        self.last_editor = user
         if not self.id:
             self.version = 1
         else:
             self.version += 1
         super(Question, self).save(*args, **kwargs)
 
+    def save(self, *args, **kwargs):
+        #print("test")
+        if not self.id:
+            self.version = 1
+        else:
+            self.version += 1
+        super(Question, self).save(*args, **kwargs)
+        
+
     def __str__(self):
         return self.name
 
-@receiver(post_save, sender=Question)
-def create_user_profile(sender, instance, created, update_fields, **kwargs):
-    if created:
-        print("created")
+@receiver(pre_save, sender=Question)
+def question_pre_save(sender, instance, **kwargs):
+    #Updating
+    #print(instance.last_editor)
+    if instance.id:
+        prev_question = Question.objects.get(pk=instance.id)
+        field_track = {}
+        for field in instance.track_fields:
+            value = getattr(instance, field)
+            orig_value = getattr(prev_question, field)
+            if value != orig_value:
+                field_track[field] = [orig_value, value]
+
+        if field_track:
+            note_str = 'Question Update {\n'
+            for k, v in field_track.items():
+                note_str += ('{field} : {orig_value} -> {value}\n').format(
+                    field=k,
+                    orig_value=v[0],
+                    value=v[1],
+                )
+            note_str += '}'
+            c = QuestionChangeLog(
+                question = instance,
+                user = instance.last_editor,
+                change_set = note_str,
+                previous_version = field_track.get('version')[0],
+            )
+            c.save()
+            print(note_str)
     else:
-        print(update_fields)
+        print("created")
+    
 
 class Course(models.Model):
     class Meta:

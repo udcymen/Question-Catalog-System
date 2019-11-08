@@ -146,8 +146,8 @@ def quetion_create(request):
             question_form = QuestionForm(request.POST)
             if question_form.is_valid():
                 q = question_form.save(commit=False)
-                q.last_editor = request.user
-                q.save()
+                #q.last_editor = request.user
+                q.user_save(request.user)
                 question_form.save_m2m()
 
                 return HttpResponse('Create Successfully')
