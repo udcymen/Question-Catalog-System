@@ -3,15 +3,15 @@
 {% block title %}Question Create{% endblock %}
 
 {% block content %}
-    <form method="POST">
-        {% csrf_token %}
-        {{ form.as_p }}
-        {% for i in form.errors %}
-        {{i}}
-        {% endfor %}
-        {% if form.errors %}
-        error!
-        {% endif %} 
-        <input type="submit" value="Save">
-    </form>
+<form method="POST">
+    {% csrf_token %}
+    {{ form.as_p }}
+    {% for i in form.errors %}
+    {{i}}
+    {% endfor %}
+    {% if form.errors %}
+    error!
+    {% endif %}
+    <input type="submit" value="Save">
+</form>
 {% endblock %}
