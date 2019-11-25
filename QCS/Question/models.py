@@ -1,7 +1,7 @@
 from django.db import models
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.contrib.auth.models import User
-from django.db.models.signals import pre_save
+from django.db.models.signals import pre_save, post_save, pre_delete
 from django.dispatch import receiver
 from datetime import datetime
 
@@ -24,8 +24,8 @@ class QuestionType(models.Model):
 
 class QuestionChangeLog(models.Model):
     # Foreign Keys
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
-    question = models.ForeignKey('Question', on_delete=models.CASCADE)
+    user = models.ForeignKey(User, null=True, blank=True, on_delete=models.SET_NULL)
+    question = models.ForeignKey('Question',  null=True, blank=True, on_delete=models.SET_NULL)
     
     # Regular Fields
     change_set = models.CharField(max_length=256)
@@ -121,9 +121,32 @@ def question_pre_save(sender, instance, **kwargs):
             )
             c.save()
             print(note_str)
-    else:
-        print("created")
-    
+        
+        
+@receiver(post_save, sender=Question)
+def question_post_save(sender, instance, created, **kwargs):
+    if created:
+        note_str = 'Question Created'
+        c = QuestionChangeLog(
+            question = instance,
+            user = instance.last_editor,
+            change_set = note_str,
+            previous_version = 0,
+        )
+        c.save()
+        print(note_str)
+
+#@receiver(pre_delete, sender=Question)
+#def question_pre_delete(sender, instance, **kwargs):
+#    note_str = getattr(getattr(instance, 'last_editor'), 'username') + ' deleted ' + getattr(instance, 'name')
+#    c = QuestionChangeLog(
+#        question = None,
+#        user = None,
+#        change_set = note_str,
+#        previous_version =  getattr(instance, 'version'),
+#    )
+#    c.save()
+#    print(note_str)
 
 class Course(models.Model):
     class Meta:
