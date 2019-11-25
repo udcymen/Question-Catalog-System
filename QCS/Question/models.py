@@ -136,17 +136,16 @@ def question_post_save(sender, instance, created, **kwargs):
         c.save()
         print(note_str)
 
-#@receiver(pre_delete, sender=Question)
-#def question_pre_delete(sender, instance, **kwargs):
-#    note_str = getattr(getattr(instance, 'last_editor'), 'username') + ' deleted ' + getattr(instance, 'name')
-#    c = QuestionChangeLog(
-#        question = None,
-#        user = None,
-#        change_set = note_str,
-#        previous_version =  getattr(instance, 'version'),
-#    )
-#    c.save()
-#    print(note_str)
+@receiver(pre_delete, sender=Question)
+def question_pre_delete(sender, instance, **kwargs):
+    note_str = getattr(getattr(instance, 'last_editor'), 'username') + ' deleted ' + getattr(instance, 'name')
+    c = QuestionChangeLog(
+        user = instance.last_editor,
+        change_set = note_str,
+        previous_version =  getattr(instance, 'version'),
+    )
+    c.save()
+    print(note_str)
 
 class Course(models.Model):
     class Meta:
