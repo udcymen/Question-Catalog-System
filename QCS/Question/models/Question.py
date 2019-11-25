@@ -1,40 +1,12 @@
 from django.db import models
-from django.core.validators import MaxValueValidator, MinValueValidator
+from .QuestionChangelog import QuestionChangelog
+from .QuestionTopic import QuestionTopic
+from .QuestionType import QuestionType
+from django.dispatch import receiver
 from django.contrib.auth.models import User
 from django.db.models.signals import pre_save, post_save, pre_delete
-from django.dispatch import receiver
-from datetime import datetime
+from django.core.validators import MaxValueValidator, MinValueValidator
 
-
-class QuestionTopic(models.Model):
-    # Regular Fields
-    name = models.CharField(max_length=256, unique=True)
-
-    def __str__(self):
-        return self.name
-
-
-class QuestionType(models.Model):
-    # Regular Fields
-    name = models.CharField(max_length=256, unique=True)
-
-    def __str__(self):
-        return self.name
-
-
-class QuestionChangeLog(models.Model):
-    # Foreign Keys
-    user = models.ForeignKey(User, null=True, blank=True, on_delete=models.SET_NULL)
-    question = models.ForeignKey('Question',  null=True, blank=True, on_delete=models.SET_NULL)
-    
-    # Regular Fields
-    change_set = models.CharField(max_length=256)
-    previous_version = models.PositiveIntegerField()
-    date = models.DateTimeField(auto_now=True, editable=False)
-
-    def __str__(self):
-        return str(self.question) + ": Version " + str(self.previous_version)
-    
 
 class Question(models.Model):
     # Foreign Keys
@@ -113,7 +85,7 @@ def question_pre_save(sender, instance, **kwargs):
                     value=v[1],
                 )
             note_str += '}'
-            c = QuestionChangeLog(
+            c = QuestionChangelog(
                 question = instance,
                 user = instance.last_editor,
                 change_set = note_str,
@@ -127,7 +99,7 @@ def question_pre_save(sender, instance, **kwargs):
 def question_post_save(sender, instance, created, **kwargs):
     if created:
         note_str = 'Question Created'
-        c = QuestionChangeLog(
+        c = QuestionChangelog(
             question = instance,
             user = instance.last_editor,
             change_set = note_str,
@@ -147,79 +119,3 @@ def question_post_save(sender, instance, created, **kwargs):
 #    )
 #    c.save()
 #    print(note_str)
-
-class Course(models.Model):
-    class Meta:
-        unique_together = ('year', 'semester', 'code', 'section')
-
-
-    # Regular Fields
-    name = models.CharField(max_length=256)
-    code = models.PositiveSmallIntegerField(default=100, validators=[MinValueValidator(100), MaxValueValidator(999)])
-    section = models.PositiveSmallIntegerField(default=100, validators=[MinValueValidator(0), MaxValueValidator(999)])
-    year = models.PositiveSmallIntegerField(default=datetime.now().year, validators=[MinValueValidator(1000), MaxValueValidator(9999)])
-
-    # Semester Choice - ENUM
-    FALL = 'FA'
-    WINTER = 'WI'
-    SPRING = 'SP'
-    SUMMER = 'SU'
-    SEMESTER = [
-        (FALL, 'Fall'),
-        (WINTER, 'Winter'),
-        (SPRING, 'Spring'),
-        (SUMMER, 'Summer')
-    ]
-    semester = models.CharField(
-        max_length=2,
-        choices=SEMESTER,
-        default=FALL
-    )
-
-    # Foreign Keys
-    question = models.ManyToManyField(Question, blank=True)
-    
-    def __str__(self):
-        return " ".join([str(self.year), self.get_semester_display(), "CISC" + str(self.code) + "-" + str(self.section), self.name])
-
-
-class UserRole(models.Model):
-    # Regular Fields
-    name = models.CharField(max_length=256, unique=True)
-
-    def __str__(self):
-        return self.name
-        
-
-class Permission(models.Model):
-    class Meta:
-        unique_together = ('user', 'role', 'course')
-
-
-    # Foreign Keys    
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
-    role = models.ForeignKey(UserRole, on_delete=models.CASCADE)
-    course = models.ForeignKey(Course, on_delete=models.CASCADE)
-
-    def __str__(self):
-        return str(self.user) + ": " + str(self.role) + " - " + str(self.course)
-
-
-class Submission(models.Model):
-    # Foreign Keys
-    question = models.ForeignKey(Question, on_delete=models.CASCADE)
-
-    # Regular Fields
-    name = models.CharField(max_length=256)
-    student_code = models.CharField(max_length=256)
-    correct = models.BooleanField(default=False)
-    score = models.PositiveSmallIntegerField(default=0, validators=[MinValueValidator(0), MaxValueValidator(100)])
-    feedback = models.CharField(max_length=256)
-    parameter = models.CharField(max_length=256)
-    output = models.CharField(max_length=256)
-    detail = models.CharField(max_length=256)
-    status = models.CharField(max_length=256)
-
-    def __str__(self):
-        return self.name
-
