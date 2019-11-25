@@ -1,40 +1,12 @@
 from django.db import models
-from django.core.validators import MaxValueValidator, MinValueValidator
+from .QuestionChangelog import QuestionChangelog
+from .QuestionTopic import QuestionTopic
+from .QuestionType import QuestionType
+from django.dispatch import receiver
 from django.contrib.auth.models import User
 from django.db.models.signals import pre_save, post_save, pre_delete
-from django.dispatch import receiver
-from datetime import datetime
+from django.core.validators import MaxValueValidator, MinValueValidator
 
-
-class QuestionTopic(models.Model):
-    # Regular Fields
-    name = models.CharField(max_length=256, unique=True)
-
-    def __str__(self):
-        return self.name
-
-
-class QuestionType(models.Model):
-    # Regular Fields
-    name = models.CharField(max_length=256, unique=True)
-
-    def __str__(self):
-        return self.name
-
-
-class QuestionChangeLog(models.Model):
-    # Foreign Keys
-    user = models.ForeignKey(User, null=True, blank=True, on_delete=models.SET_NULL)
-    question = models.ForeignKey('Question',  null=True, blank=True, on_delete=models.SET_NULL)
-    
-    # Regular Fields
-    change_set = models.CharField(max_length=256)
-    previous_version = models.PositiveIntegerField()
-    date = models.DateTimeField(auto_now=True, editable=False)
-
-    def __str__(self):
-        return str(self.question) + ": Version " + str(self.previous_version)
-    
 
 class Question(models.Model):
     # Foreign Keys
@@ -113,7 +85,7 @@ def question_pre_save(sender, instance, **kwargs):
                     value=v[1],
                 )
             note_str += '}'
-            c = QuestionChangeLog(
+            c = QuestionChangelog(
                 question = instance,
                 user = instance.last_editor,
                 change_set = note_str,
@@ -127,7 +99,7 @@ def question_pre_save(sender, instance, **kwargs):
 def question_post_save(sender, instance, created, **kwargs):
     if created:
         note_str = 'Question Created'
-        c = QuestionChangeLog(
+        c = QuestionChangelog(
             question = instance,
             user = instance.last_editor,
             change_set = note_str,
