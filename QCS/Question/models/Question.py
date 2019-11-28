@@ -112,7 +112,7 @@ def question_post_save(sender, instance, created, **kwargs):
 @receiver(pre_delete, sender=Question)
 def question_pre_delete(sender, instance, **kwargs):
     note_str = getattr(getattr(instance, 'last_editor'), 'username') + ' deleted ' + getattr(instance, 'name')
-    c = QuestionChangeLog(
+    c = QuestionChangelog(
         user = instance.last_editor,
         change_set = note_str,
         previous_version =  getattr(instance, 'version'),

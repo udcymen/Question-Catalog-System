@@ -15,7 +15,8 @@ def question_detail(request, question_ref):
             'author': question.author,
             'description': question.description,
             'instruction': question.instruction,
-            'topic': [topic.name for topic in list(question.topic.all())]
+            'difficulty': question.difficulty,
+            'topic': question.topic.all()
         }
         return render(request, 'question-detail.html', info)
 
